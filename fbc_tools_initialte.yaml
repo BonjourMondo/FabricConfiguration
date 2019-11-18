@@ -1,0 +1,97 @@
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: fabric-learn
+  name: cloud-fbc-tools
+  annotations:
+    k8s.eip.work/workload: cloud-fbc-tools
+    k8s.eip.work/displayName: Fabric Tools
+    k8s.eip.work/service: none
+    k8s.eip.work/ingress: 'false'
+  labels:
+    k8s.eip.work/layer: cloud
+    k8s.eip.work/name: cloud-fbc-tools
+spec:
+  selector:
+    matchLabels:
+      k8s.eip.work/layer: cloud
+      k8s.eip.work/name: cloud-fbc-tools
+  template:
+    metadata:
+      labels:
+        k8s.eip.work/layer: cloud
+        k8s.eip.work/name: cloud-fbc-tools
+    spec:
+      securityContext:
+        seLinuxOptions: {}
+      imagePullSecrets: []
+      restartPolicy: Always
+      initContainers: []
+      containers:
+        - image: 'hyperledger/fabric-tools:latest'
+          imagePullPolicy: IfNotPresent
+          name: fbc-tools
+          volumeMounts:
+            - name: crypto
+              mountPath: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/
+              mountPropagation: None
+            - name: scripts
+              mountPath: /opt/gopath/src/github.com/hyperledger/fabric/peer/scripts/
+              mountPropagation: None
+            - name: channel-artifacts
+              mountPath: >-
+                /opt/gopath/src/github.com/hyperledger/fabric/peer/channel-artifacts
+              mountPropagation: None
+            - name: configtx
+              mountPath: /etc/hyperledger/fabric/configtx.yaml
+              mountPropagation: HostToContainer
+            - name: crypto-config
+              mountPath: /etc/hyperledger/fabric/crypto-config.yaml
+              mountPropagation: HostToContainer
+            - name: docker-sock
+              mountPath: /var/run
+              mountPropagation: None
+          command:
+            - /bin/bash
+            - '-c'
+            - while true; do sleep 20191116; done
+          resources:
+            limits:
+            requests:
+          env:
+            - name: GOPATH
+              value: /opt/gopath
+            - name: CORE_VM_ENDPOINT
+              value: 'unix:///host/var/run/docker.sock'
+          securityContext:
+            seLinuxOptions: {}
+      volumes:
+        - name: crypto
+          hostPath:
+            path: /root/containers_volume/fabric/tools/crypto-config
+            type: DirectoryOrCreate
+        - name: scripts
+          hostPath:
+            path: /root/containers_volume/fabric/tools/scripts
+            type: DirectoryOrCreate
+        - name: channel-artifacts
+          hostPath:
+            path: /root/containers_volume/fabric/tools/channel-artifacts
+            type: DirectoryOrCreate
+        - name: configtx
+          hostPath:
+            path: /root/containers_volume/fabric/tools/configtx.yaml
+            type: FileOrCreate
+        - name: crypto-config
+          hostPath:
+            path: /root/containers_volume/fabric/tools/crypto-config.yaml
+            type: FileOrCreate
+        - name: docker-sock
+          hostPath:
+            path: /root/containers_volume/fabric/tools/docker-sock
+            type: DirectoryOrCreate
+      terminationGracePeriodSeconds: 30
+  replicas: 1
+
