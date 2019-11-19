@@ -30,7 +30,7 @@ spec:
       restartPolicy: Always
       initContainers: []
       containers:
-        - image: 'hyperledger/cli:latest'
+        - image: 'hyperledger/fabric-tools:latest'
           workingDir: /opt/gopath/src/github.com/hyperledger/fabric/peer
           imagePullPolicy: IfNotPresent
           name: fbc-tools
