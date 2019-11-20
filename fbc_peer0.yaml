@@ -33,8 +33,10 @@ spec:
       hostAliases:
         - ip: "127.0.0.1"
           hostnames: 
-            - orderer.example.com
             - peer0.org1.example.com
+        - ip: "192.168.50.251"
+          hostnames: 
+            - orderer.example.com
       containers:
         - image: 'hyperledger/fabric-peer:latest'
           workingDir: /opt/gopath/src/github.com/hyperledger/fabric/peer
@@ -42,28 +44,35 @@ spec:
           name: peer0
           volumeMounts:
             - name: docker-sock
-              mountPath: /host/var/run
+              mountPath: /var/run
             - name: peer-org
-              mountPath: /etc/hyperledger/msp            
+              mountPath: /etc/hyperledger/msp     
+            - name: channel-artifacts
+              mountPath: /etc/hyperledger/channel-artifacts
           command:
             - peer
             - node
             - start
+            # - /bin/bash
+            # - '-c'
+            # - while true; do sleep 20191116; done
           resources:
             limits:
             requests:
           env: 
             - name: CORE_VM_ENDPOINT
-              value: unix:///host/var/run/docker.sock
+              value: unix:///var/run/docker.sock
             - name: CORE_PEER_ID
               value: "peer0.org1.example.com"
             - name: CORE_PEER_ADDRESS
-              value: "peer0.org1.example.com:7052"
+              value: "peer0.org1.example.com:7051"
+            - name: CORE_PEER_MSPCONFIGPATH
+              value: /etc/hyperledger/msp/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
             - name: CORE_PEER_GOSSIP_EXTERNALENDPOINT
-              value: "peer0.org1.example.com:7052"
+              value: "peer0.org1.example.com:7051"
             - name: CORE_PEER_GOSSIP_BOOTSTRAP
-              value: "peer0.org1.example.com:7052"
-            - name: CHAINCODE_LISTEN_ADDRESS
+              value: "peer0.org1.example.com:7051"
+            - name: CORE_PEER_CHAINCODELISTENADDRESS
               value: "peer0.org1.example.com:8000"
             # - name: CORE_VM_HOSTCONFIG_DNS
             #   value: 139.59.77.160
@@ -73,8 +82,8 @@ spec:
               value: "false"
             - name: CORE_LOGGING_LEVEL
               value: "DEBUG"
-            - name: CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE
-              value: "bridge"
+            # - name: CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE
+            #   value: "bridge"
             - name: CORE_PEER_GOSSIP_USELEADERELECTION
               value: "true"
             - name: CORE_PEER_GOSSIP_ORGLEADER
@@ -100,6 +109,10 @@ spec:
           hostPath:
             path: /root/fabric/tools/crypto-config
             type: Directory
+        - name: channel-artifacts
+          hostPath:
+            path: /root/fabric/tools/channel-artifacts
+            type: Directory    
       terminationGracePeriodSeconds: 30
   replicas: 1
 
@@ -121,11 +134,11 @@ spec:
     k8s.eip.work/name: peer0
   type: NodePort
   ports:
-    - port: 7052
-      targetPort: 7052
+    - port: 7051
+      targetPort: 7051
       protocol: TCP
       name: djcn7b
-      nodePort: 30752
+      nodePort: 30751
     - port: 8000
       targetPort: 8000
       protocol: TCP

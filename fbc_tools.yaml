@@ -29,6 +29,10 @@ spec:
       imagePullSecrets: []
       restartPolicy: Always
       initContainers: []
+      hostAliases:
+        - ip: "192.168.50.251"
+          hostnames: 
+            - peer0.org1.example.com
       containers:
         - image: 'hyperledger/fabric-tools:latest'
           workingDir: /opt/gopath/src/github.com/hyperledger/fabric/peer
@@ -36,7 +40,7 @@ spec:
           name: fbc-tools
           volumeMounts:
             - name: chaincode
-              mountPath: /opt/gopath/src/github.com/hyperledger/fabric/examples/chaincode/go
+              mountPath: /opt/gopath/src/chaincode/go/
             - name: crypto
               mountPath: /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/
             - name: scripts
@@ -61,11 +65,11 @@ spec:
             - name: GOPATH
               value: /opt/gopath
             - name: CORE_VM_ENDPOINT
-              value: 'unix:///host/var/run/docker.sock'
+              value: unix:///var/run/docker.sock
             - name: CORE_PEER_ID
               value: cli
             - name: CORE_PEER_ADDRESS
-              value: "kexin228:30751"
+              value: "peer0.org1.example.com:30751"
             - name: CORE_PEER_LOCALMSPID
               value: "Org1MSP"
             - name: CORE_PEER_TLS_ENABLED

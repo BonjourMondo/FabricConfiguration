@@ -58,7 +58,7 @@ spec:
             - name: ORDERER_GENERAL_GENESISMETHOD
               value: "file"
             - name: ORDERER_GENERAL_GENESISFILE
-              value: "/etc/hyperledger/configtx/orderer.genesis.block"
+              value: "/etc/hyperledger/configtx/fabricchannel.block"
             - name: ORDERER_GENERAL_LOCALMSPID
               value: "OrdererMSP"
             - name: ORDERER_GENERAL_LOCALMSPDIR
